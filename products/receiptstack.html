@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Receipt Stack — every receipt, saved for good</title>
-  <meta name="description" content="Scroll to fly through the journey of a receipt — from crumpled chaos to a tidy, searchable archive in your own cloud." />
+  <meta name="description" content="The journey of a receipt — from crumpled chaos to a tidy, searchable archive in your own Google Drive or iCloud, with a yearly spreadsheet index." />
   <style>
     :root, .sw-root {
       --sw-bg: #f4f8f7;          /* scene background colour */
@@ -12,11 +12,165 @@
       --sw-ink-soft: #5b6f6d;
       --sw-accent: #03605c;
     }
+
+    /* ---- Static version: served to phones/tablets instead of the scroll film ----
+       Desktop gets the scroll-world cinematic (#world); anything coarse-pointered or
+       narrow gets this stacked page built from the same diorama stills. No video is
+       fetched on mobile at all — the engine is never mounted there. */
+    #static { display: none; }
+    @media (max-width: 860px), (pointer: coarse) {
+      #world { display: none !important; }
+      #static { display: block; }
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+
+    #static {
+      background: #f4f8f7;
+      color: #1a2b2a;
+      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    #static .s-wrap { max-width: 560px; margin: 0 auto; padding: 0 20px; }
+    #static img {
+      display: block; width: 100%; height: auto;
+      aspect-ratio: 1800 / 1196; object-fit: cover;
+      border-radius: 18px; background: #eef4f3;
+      box-shadow: 0 6px 24px rgba(3, 96, 92, .10);
+    }
+
+    /* hero */
+    #static .s-hero { padding: 26px 0 8px; text-align: center; }
+    #static .s-brand {
+      margin: 0 0 22px; font-size: .82rem; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase; color: #03605c;
+    }
+    #static .s-hero h1 {
+      margin: 22px 0 10px; font-size: 2rem; line-height: 1.15;
+      letter-spacing: -.02em; font-weight: 800;
+    }
+    #static .s-sub { margin: 0 auto; max-width: 34ch; color: #5b6f6d; }
+
+    /* buttons */
+    #static .s-btn {
+      display: inline-block; margin-top: 22px; padding: 14px 26px;
+      background: #03605c; color: #fff; text-decoration: none;
+      border-radius: 12px; font-weight: 650; font-size: .98rem;
+    }
+    #static .s-btn.ghost { background: transparent; color: #03605c; box-shadow: inset 0 0 0 1.5px rgba(3,96,92,.35); }
+
+    /* steps */
+    #static .s-h2 {
+      margin: 52px 0 26px; text-align: center; font-size: .82rem;
+      letter-spacing: .14em; text-transform: uppercase; color: #5b6f6d; font-weight: 700;
+    }
+    #static .s-step { margin: 0 0 6px; }
+    #static .s-step:not(:last-of-type)::after {
+      content: ""; display: block; width: 2px; height: 34px; margin: 26px auto 0;
+      background: repeating-linear-gradient(to bottom, rgba(3,96,92,.35) 0 5px, transparent 5px 10px);
+    }
+    #static .s-meta { display: flex; align-items: center; gap: 10px; margin: 18px 0 6px; }
+    #static .s-num {
+      flex: none; width: 26px; height: 26px; border-radius: 50%;
+      background: #03605c; color: #fff; font-size: .76rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #static .s-eyebrow {
+      margin: 0; font-size: .74rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: #03605c;
+    }
+    #static .s-step h3 { margin: 0 0 8px; font-size: 1.42rem; line-height: 1.2; letter-spacing: -.015em; }
+    #static .s-step p.s-body { margin: 0; color: #5b6f6d; }
+    #static .s-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+    #static .s-tags li {
+      font-size: .8rem; color: #03605c; background: #fff;
+      border-radius: 999px; padding: 6px 13px; box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    /* closing card */
+    #static .s-close {
+      margin: 54px 0 8px; padding: 34px 24px; text-align: center;
+      background: #fff; border-radius: 20px; box-shadow: 0 6px 24px rgba(3,96,92,.10);
+    }
+    #static .s-close h2 { margin: 0 0 10px; font-size: 1.6rem; line-height: 1.2; letter-spacing: -.02em; }
+    #static .s-close p { margin: 0 auto; max-width: 34ch; color: #5b6f6d; }
+    #static .s-close .s-btn + .s-btn { margin-left: 8px; }
+    #static .s-tail { padding-bottom: 34px; }
+
+    @media (max-width: 380px) {
+      #static .s-hero h1 { font-size: 1.7rem; }
+      #static .s-step h3 { font-size: 1.28rem; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      #static img { transition: none; }
+    }
   </style>
 </head>
 <body>
   <div id="top"></div>
   <div id="world"></div>
+
+  <div id="static">
+    <div class="s-wrap">
+      <header class="s-hero">
+        <p class="s-brand">Receipt Stack</p>
+        <img src="receiptstack/assets/hero.webp" width="1800" height="1196" decoding="async"
+             alt="A paper-craft phone standing in soft light, with receipts folding themselves into tidy teal folders around it." />
+        <h1>Every receipt, saved for good.</h1>
+        <p class="s-sub">Snap a receipt and it's read, filed, and indexed — in your own cloud, private by design.</p>
+        <a class="s-btn" href="../support.html">Coming soon to the App Store</a>
+      </header>
+
+      <main>
+        <h2 class="s-h2">How it works</h2>
+
+        <section class="s-step">
+          <img src="receiptstack/assets/counter.webp" width="1800" height="1196" loading="lazy" decoding="async"
+               alt="A paper-craft café counter with a register printing a long receipt and a box overflowing with crumpled ones." />
+          <div class="s-meta"><span class="s-num">01</span><p class="s-eyebrow">Every purchase, everywhere</p></div>
+          <h3>Snap it before it crumples.</h3>
+          <p class="s-body">Receipts fade, crumple and vanish — so point your phone at one right at the counter and move on.</p>
+          <ul class="s-tags"><li>Photos</li><li>PDFs</li><li>Share sheet</li></ul>
+        </section>
+
+        <section class="s-step">
+          <img src="receiptstack/assets/workshop.webp" width="1800" height="1196" loading="lazy" decoding="async"
+               alt="A paper-craft sorting workshop where two workers stamp labels onto receipts moving along a conveyor." />
+          <div class="s-meta"><span class="s-num">02</span><p class="s-eyebrow">On-device smarts</p></div>
+          <h3>It reads the receipt for you.</h3>
+          <p class="s-body">Vendor, date, amounts and tax are picked out automatically — right on your phone, never on a server.</p>
+          <ul class="s-tags"><li>Private OCR</li><li>No cloud AI</li><li>You confirm</li></ul>
+        </section>
+
+        <section class="s-step">
+          <img src="receiptstack/assets/vault.webp" width="1800" height="1196" loading="lazy" decoding="async"
+               alt="A paper-craft archive library of teal folders with a glowing cloud floating above, threads connecting them." />
+          <div class="s-meta"><span class="s-num">03</span><p class="s-eyebrow">Yours, not ours</p></div>
+          <h3>Filed in your own cloud.</h3>
+          <p class="s-body">Every receipt lands in tidy year and month folders in your Google Drive or iCloud — we never hold your data.</p>
+          <ul class="s-tags"><li>Google Drive</li><li>iCloud Drive</li><li>Never deleted</li></ul>
+        </section>
+
+        <section class="s-step">
+          <img src="receiptstack/assets/ledger.webp" width="1800" height="1196" loading="lazy" decoding="async"
+               alt="A paper-craft sunlit study with a large open ledger book and someone leaning back with a coffee." />
+          <div class="s-meta"><span class="s-num">04</span><p class="s-eyebrow">Tax time, handled</p></div>
+          <h3>A yearly index writes itself.</h3>
+          <p class="s-body">Dates, vendors, totals and tax — one clean spreadsheet per year, ready when your accountant asks.</p>
+          <ul class="s-tags"><li>Google Sheets</li><li>CSV</li></ul>
+        </section>
+
+        <section class="s-close">
+          <h2>Every receipt, saved for good.</h2>
+          <p>Free to try, private by design, and your archive belongs to you forever.</p>
+          <a class="s-btn" href="../support.html">Coming soon to the App Store</a>
+        </section>
+      </main>
+      <div class="s-tail"></div>
+    </div>
+  </div>
+
   <footer style="background:#f4f8f7;color:#5b6f6d;text-align:center;padding:28px 16px calc(28px + env(safe-area-inset-bottom));font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
     <p style="margin:0 0 6px"><a href="../privacy.html" style="color:#03605c">Privacy Policy</a> &middot; <a href="../terms.html" style="color:#03605c">Terms</a> &middot; <a href="../support.html" style="color:#03605c">Support</a></p>
     <p style="margin:0">A Maritime Digital product.</p>
@@ -24,6 +178,9 @@
 
   <script src="receiptstack/scrub-engine.js"></script>
   <script>
+    // Phones and tablets get the static page above; only mount the scroll film on
+    // pointer-precise, wide screens. Keep this rule in sync with the CSS media query.
+    if (!window.matchMedia('(max-width: 860px), (pointer: coarse)').matches)
     mountScrollWorld(document.getElementById('world'), {
       brand: { name: 'Receipt Stack', href: '#top' },
       cta: { label: 'Get the app', href: '#finale' },
@@ -35,8 +192,6 @@
           id: 'counter', label: 'Snap It',
           still: 'receiptstack/assets/counter.webp',
           clip: 'receiptstack/assets/vid/counter.mp4',
-          clipMobile: 'receiptstack/assets/vid/counter-m.mp4',
-          stillMobile: 'receiptstack/assets/counter-m.webp',
           accent: '#03605c',
           scroll: 1.8, linger: 0.45,
           eyebrow: 'Every purchase, everywhere',
@@ -48,8 +203,6 @@
           id: 'workshop', label: 'Auto-Read',
           still: 'receiptstack/assets/workshop.webp',
           clip: 'receiptstack/assets/vid/workshop.mp4',
-          clipMobile: 'receiptstack/assets/vid/workshop-m.mp4',
-          stillMobile: 'receiptstack/assets/workshop-m.webp',
           accent: '#024744',
           eyebrow: 'On-device smarts',
           title: 'It reads the receipt for you.',
@@ -60,8 +213,6 @@
           id: 'vault', label: 'Your Cloud',
           still: 'receiptstack/assets/vault.webp',
           clip: 'receiptstack/assets/vid/vault.mp4',
-          clipMobile: 'receiptstack/assets/vid/vault-m.mp4',
-          stillMobile: 'receiptstack/assets/vault-m.webp',
           accent: '#024744',
           scroll: 1.5, linger: 0.35,
           eyebrow: 'Yours, not ours',
@@ -73,8 +224,6 @@
           id: 'ledger', label: 'The Index',
           still: 'receiptstack/assets/ledger.webp',
           clip: 'receiptstack/assets/vid/ledger.mp4',
-          clipMobile: 'receiptstack/assets/vid/ledger-m.mp4',
-          stillMobile: 'receiptstack/assets/ledger-m.webp',
           accent: '#03605c',
           eyebrow: 'Tax time, handled',
           title: 'A yearly index writes itself.',
@@ -85,8 +234,6 @@
           id: 'finale', label: 'Receipt Stack',
           still: 'receiptstack/assets/hero.webp',
           clip: 'receiptstack/assets/vid/hero.mp4',
-          clipMobile: 'receiptstack/assets/vid/hero-m.mp4',
-          stillMobile: 'receiptstack/assets/hero-m.webp',
           accent: '#03605c',
           scroll: 1.7, linger: 0.45,
           eyebrow: 'Receipt Stack',
@@ -102,12 +249,6 @@
         'receiptstack/assets/vid/conn3.mp4',
         'receiptstack/assets/vid/conn4.mp4',
         'receiptstack/assets/vid/conn5.mp4',
-      ],
-      connectorsMobile: [
-        'receiptstack/assets/vid/conncw-m.mp4',
-        'receiptstack/assets/vid/conn3-m.mp4',
-        'receiptstack/assets/vid/conn4-m.mp4',
-        'receiptstack/assets/vid/conn5-m.mp4',
       ],
     });
   </script>
