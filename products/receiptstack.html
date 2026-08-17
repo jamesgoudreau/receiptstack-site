@@ -186,7 +186,11 @@
       cta: { label: 'Get the app', href: '#finale' },
       hint: 'scroll to fly in',
       diveScroll: 1.3,
-      connScroll: 0.9,
+      // Connectors are travel, not content: the camera pulls out of one
+      // diorama and drops into the next. Held long they read as a reset
+      // between scenes rather than one continuous flight, and they are
+      // where the screen has no words on it. Kept short and brisk.
+      connScroll: 0.5,
       sections: [
         {
           id: 'counter', label: 'Snap It',

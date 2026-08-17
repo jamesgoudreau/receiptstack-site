@@ -77,6 +77,10 @@ function mountScrollWorld(container, config) {
   const DIVE_W = config.diveScroll || 1.3;
   const CONN_W = config.connScroll || 0.9;
   const CROSSFADE = (config.crossfade != null) ? config.crossfade : 0.12;  // seam dissolve width (vh)
+  // Fraction of a connector each neighbouring headline ramps across. 0.5
+  // means the outgoing copy finishes clearing exactly as the incoming one
+  // starts, at the connector's midpoint.
+  const COPY_RAMP = (config.copyRamp != null) ? config.copyRamp : 0.5;
   const N = SECTIONS.length;
   if (!N) return;
 
@@ -90,6 +94,8 @@ function mountScrollWorld(container, config) {
                    accent: s.accent, w: s.scroll || DIVE_W, linger: s.linger || 0 };
     SEGMENTS.push(dive);
     s._seg = dive;
+    dive.prevConnW = (i > 0 && CONNECTORS[i - 1]) ? CONN_W : 0;
+    dive.nextConnW = (i < N - 1 && CONNECTORS[i]) ? CONN_W : 0;
     // A connector is optional: if connectors[i] is falsy, the two dives simply
     // crossfade directly (no fly-over). Lets a page complete even when a
     // connector can't be generated (e.g. a content-filter false-positive).
@@ -244,11 +250,17 @@ function mountScrollWorld(container, config) {
     for (let i = 0; i < N; i++) {
       const seg = SECTIONS[i]._seg;
       const pr = clamp((y - seg.start) / (seg.end - seg.start), 0, 1);
-      const before = y < seg.start, after = y > seg.end;
+      // Copy holds at full opacity for the whole dive and ramps out across
+      // half the adjoining connector, so the flight between scenes is not
+      // spent staring at a wordless screen. The two ramps meet at the
+      // connector's midpoint: one headline clears exactly as the next
+      // arrives, and only that instant is bare.
+      const inRamp = Math.max(seg.prevConnW * COPY_RAMP, 0.12) * vh;
+      const outRamp = Math.max(seg.nextConnW * COPY_RAMP, 0.12) * vh;
       let cop;
-      if (i === 0) cop = after ? 0 : smooth(1 - pr / 0.62);            // greets on landing
-      else if (i === N - 1) cop = before ? 0 : smooth(pr / 0.4);       // holds CTA at the end
-      else cop = (before || after) ? 0 : smooth(1 - Math.abs(pr - 0.5) / 0.5);
+      if (y < seg.start) cop = (i === 0) ? 1 : smooth(1 - (seg.start - y) / inRamp);
+      else if (y > seg.end) cop = (i === N - 1) ? 1 : smooth(1 - (y - seg.end) / outRamp);
+      else cop = 1;
       const c = copies[i];
       c.style.opacity = cop;
       c.style.transform = reduce ? 'none' : `translateY(${(0.5 - pr) * 4}vh)`;
