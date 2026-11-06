@@ -55,8 +55,13 @@
     /* buttons */
     #static .s-btn {
       display: inline-block; margin-top: 22px; padding: 14px 26px;
+      min-height: 44px; max-width: 100%;
       background: #03605c; color: #fff; text-decoration: none;
       border-radius: 12px; font-weight: 650; font-size: .98rem;
+      text-align: center;
+    }
+    #static .s-btn:focus-visible {
+      outline: 3px solid #1a2b2a; outline-offset: 3px;
     }
     #static .s-btn.ghost { background: transparent; color: #03605c; box-shadow: inset 0 0 0 1.5px rgba(3,96,92,.35); }
 
@@ -119,7 +124,7 @@
              alt="A paper-craft phone standing in soft light, with receipts folding themselves into tidy teal folders around it." />
         <h1>Every receipt, saved for good.</h1>
         <p class="s-sub">Snap a receipt and it's read, filed, and indexed — in your own cloud, private by design.</p>
-        <a class="s-btn" href="../support.html">Coming soon to the App Store</a>
+        <a class="s-btn" href="https://apps.apple.com/ca/app/receipt-stack-receipt-saver/id6792538831">Download on the App Store</a>
       </header>
 
       <main>
@@ -163,8 +168,8 @@
 
         <section class="s-close">
           <h2>Every receipt, saved for good.</h2>
-          <p>Free to try, private by design, and your archive belongs to you forever.</p>
-          <a class="s-btn" href="../support.html">Coming soon to the App Store</a>
+          <p>Private by design, and your archive belongs to you forever.</p>
+          <a class="s-btn" href="https://apps.apple.com/ca/app/receipt-stack-receipt-saver/id6792538831">Download on the App Store</a>
         </section>
       </main>
       <div class="s-tail"></div>
@@ -183,7 +188,7 @@
     if (!window.matchMedia('(max-width: 860px), (pointer: coarse)').matches)
     mountScrollWorld(document.getElementById('world'), {
       brand: { name: 'Receipt Stack', href: '#top' },
-      cta: { label: 'Get the app', href: '#finale' },
+      cta: { label: 'Get the app', href: 'https://apps.apple.com/ca/app/receipt-stack-receipt-saver/id6792538831' },
       hint: 'scroll to fly in',
       diveScroll: 1.3,
       // Connectors are travel, not content: the camera pulls out of one
@@ -242,9 +247,9 @@
           scroll: 1.7, linger: 0.45,
           eyebrow: 'Receipt Stack',
           title: 'Every receipt, saved for good.',
-          body: 'Free to try, private by design, and your archive belongs to you forever.',
+          body: 'Private by design, and your archive belongs to you forever.',
           tags: [],
-          cta: { primary: { label: 'Coming soon to the App Store', href: '../support.html' },
+          cta: { primary: { label: 'Download on the App Store', href: 'https://apps.apple.com/ca/app/receipt-stack-receipt-saver/id6792538831' },
                  secondary: { label: 'Get in touch', href: '../support.html' } },
         },
       ],
